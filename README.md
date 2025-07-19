@@ -61,6 +61,48 @@ python manage.py runserver
 
 ---
 
+## React Frontend (Vite SPA)
+
+The EMS frontend is a modern React SPA built with Vite, Zustand, Axios, React Router, and Bootstrap 5. It replaces the legacy HTMX UI and connects to the Django REST API for all operations.
+
+### Setup & Run (Development)
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+- App: [http://localhost:5173/](http://localhost:5173/)
+
+### Features
+- Full SPA: Companies, Departments, Employees CRUD
+- JWT authentication (login/logout)
+- Role-based UI (Admin/Manager/Employee)
+- Toast notifications for all actions
+- Dynamic dropdowns (e.g., departments by company)
+- Protected routes (React Router)
+- Zustand for state management
+- Bootstrap 5 styling
+
+### Integration with Django Backend
+- The React app expects the Django backend to be running at `http://127.0.0.1:8000/` by default.
+- API base URL is configured in `frontend/src/api/axios.js`. Update if your backend runs elsewhere.
+- All API endpoints require authentication (JWT). Login via the React UI to obtain a token.
+
+### Build for Production
+```bash
+cd frontend
+npm run build
+```
+- Output will be in `frontend/dist/`. You can serve this with any static file server or integrate with Django static files.
+
+### Troubleshooting
+- Ensure backend is running before using the React app.
+- If API requests fail, check CORS settings in Django and the API base URL in `frontend/src/api/axios.js`.
+- For more details, see `frontend/README.md` (Vite/React info).
+
+---
+
 ## API Documentation
 - **Swagger UI:** `/swagger/`
 - **Redoc:** `/redoc/`
