@@ -42,11 +42,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(default=timezone.now)
 
     objects = UserManager()
-    
+
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 
     EMAIL_FIELD = "email"
-    
+
     def __str__(self):
         return self.email

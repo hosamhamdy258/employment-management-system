@@ -1,26 +1,18 @@
-import React, { useState, useCallback } from 'react';
+import React from 'react';
 import Toast from './Toast';
-
-let addToastHandler;
-
-export function useToaster() {
-  const [, setRerender] = useState(0);
-  const addToast = useCallback((toast) => {
-    if (addToastHandler) addToastHandler(toast);
-    setRerender(x => x + 1); // force rerender
-  }, []);
-  return addToast;
-}
+import useToastStore from '../store/toast';
+import useThemeStore from '../store/theme';
 
 export default function ToastContainer() {
-  const [toasts, setToasts] = useState([]);
-  addToastHandler = (toast) => {
-    setToasts((prev) => [...prev, { ...toast, id: Math.random().toString(36).substr(2, 6) }]);
-  };
-  const removeToast = (id) => setToasts((prev) => prev.filter(t => t.id !== id));
+  const { toasts, removeToast } = useToastStore();
+  const { theme } = useThemeStore();
+
   return (
-    <div style={{ position: 'fixed', top: 20, right: 20, zIndex: 9999 }}>
-      {toasts.map(t => (
+    <div
+      className="toast-container position-fixed bottom-0 end-0 p-3"
+      style={{ zIndex: theme.zIndex?.toast || 9999 }}
+    >
+      {toasts.map((t) => (
         <Toast key={t.id} {...t} onClose={() => removeToast(t.id)} />
       ))}
     </div>

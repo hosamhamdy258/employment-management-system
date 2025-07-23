@@ -9,6 +9,12 @@ class CompanySerializer(serializers.ModelSerializer):
     class Meta:
         model = Company
         fields = ["id", "name", "num_departments", "num_employees"]
+    
+    def get_num_departments(self, obj):
+        return getattr(obj, '_num_departments', None) or obj.num_departments
+    
+    def get_num_employees(self, obj):
+        return getattr(obj, '_num_employees', None) or obj.num_employees
 
 
 class DepartmentSerializer(serializers.ModelSerializer):

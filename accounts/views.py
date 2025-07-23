@@ -6,6 +6,10 @@ from django.contrib.auth.forms import (
 from django.contrib.auth.views import LoginView
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from .serializers import UserSerializer
 
 UserModel = get_user_model()
 
@@ -41,3 +45,9 @@ class CustomLoginView(LoginView):
     form_class = CustomAuthenticationForm
 
 
+class CurrentUserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data)

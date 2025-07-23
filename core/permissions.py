@@ -1,25 +1,23 @@
 from rest_framework import permissions
 
 
-class IsAdmin(permissions.BasePermission):
-    """Allow access only to admin users."""
+class RolePermission(permissions.BasePermission):
+    allowed_roles = []
 
     def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role == "ADMIN"
+        return request.user.is_authenticated and (request.user.role in self.allowed_roles)
 
 
-class IsManager(permissions.BasePermission):
-    """Allow access to managers and admins."""
-
-    def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role in ["ADMIN", "MANAGER"]
+class IsAdmin(RolePermission):
+    allowed_roles = ["ADMIN"]
 
 
-class IsEmployee(permissions.BasePermission):
-    """Allow access to employees, managers, and admins."""
+class IsManager(RolePermission):
+    allowed_roles = ["ADMIN", "MANAGER"]
 
-    def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role in ["ADMIN", "MANAGER", "EMPLOYEE"]
+
+class IsEmployee(RolePermission):
+    allowed_roles = ["ADMIN", "MANAGER", "EMPLOYEE"]
 
 
 class IsSelfOrAdmin(permissions.BasePermission):

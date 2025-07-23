@@ -5,37 +5,70 @@ from django.core.exceptions import ValidationError
 import re
 
 
-class Company(models.Model):
-    name = models.CharField(max_length=255, unique=True)
+class RequiredFieldsModel(models.Model):
+    required_fields = []
+
+    class Meta:
+        abstract = True
+        ordering = ['-id']
 
     def clean(self):
-        if not self.name:
-            raise ValidationError({"name": "Company name is required."})
+        errors = {}
+        for field in self.required_fields:
+            if not getattr(self, field):
+                errors[field] = f"{field.replace('_', ' ').title()} is required."
+        if errors:
+            raise ValidationError(errors)
+
+
+class Company(RequiredFieldsModel):
+    required_fields = ["name"]
+    name = models.CharField(max_length=255, unique=True)
+
+    def delete(self, *args, **kwargs):
+        # Prevent deletion if company has departments or employees
+        if self.num_departments > 0:
+            raise ValidationError(f"Cannot delete company '{self.name}' as it has {self.num_departments} department(s). Please remove all departments first.")
+        if self.num_employees > 0:
+            raise ValidationError(f"Cannot delete company '{self.name}' as it has {self.num_employees} employee(s). Please remove all employees first.")
+        super().delete(*args, **kwargs)
 
     @property
     def num_departments(self):
-        return Department.objects.filter(company=self).count()
+        return getattr(self, '_num_departments', Department.objects.filter(company=self).count())
 
     @property
     def num_employees(self):
-        return Employee.objects.filter(company=self).count()
+        return getattr(self, '_num_employees', Employee.objects.filter(company=self).count())
 
     def __str__(self):
         return self.name
 
 
-class Department(models.Model):
+class Department(RequiredFieldsModel):
+    required_fields = ["company", "name"]
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
 
-    class Meta:
+    class Meta(RequiredFieldsModel.Meta):
         unique_together = ("company", "name")
 
     def clean(self):
-        if not self.name:
-            raise ValidationError({"name": "Department name is required."})
-        if not self.company:
-            raise ValidationError({"company": "Company is required."})
+        super().clean()
+        # Prevent changing company if department has employees
+        if self.pk:  # Only check for existing departments (not new ones)
+            try:
+                old_department = Department.objects.get(pk=self.pk)
+                if old_department.company != self.company and self.num_employees > 0:
+                    raise ValidationError({"company": f"Cannot change company for this department as it has {self.num_employees} employee(s). Please move or remove employees first."})
+            except Department.DoesNotExist:
+                pass  # New department, no constraint needed
+
+    def delete(self, *args, **kwargs):
+        # Prevent deletion if department has employees
+        if self.num_employees > 0:
+            raise ValidationError(f"Cannot delete department '{self.name}' as it has {self.num_employees} employee(s). Please remove all employees first.")
+        super().delete(*args, **kwargs)
 
     @property
     def num_employees(self):
@@ -45,10 +78,9 @@ class Department(models.Model):
         return f"{self.name} ({self.company.name})"
 
 
+class Employee(RequiredFieldsModel):
+    required_fields = ["company", "department", "name", "email", "mobile"]
 
-
-
-class Employee(models.Model):
     class Status(models.TextChoices):
         APPLICATION_RECEIVED = "APPLICATION_RECEIVED", "Application Received"
         INTERVIEW_SCHEDULED = "INTERVIEW_SCHEDULED", "Interview Scheduled"
@@ -64,37 +96,12 @@ class Employee(models.Model):
     address = models.TextField(blank=True)
     designation = models.CharField(max_length=255)
     hired_on = models.DateField(null=True, blank=True)
-    
-    
-    # default_error_messages = {
-    #     "invalid_choice": _("Value %(value)r is not a valid choice."),
-    #     "null": _("This field cannot be null."),
-    #     "blank": _("This field cannot be blank."),
-    #     "unique": _("%(model_name)s with this %(field_label)s already exists."),
-    #     "unique_for_date": _(
-    #         # Translators: The 'lookup_type' is one of 'date', 'year' or
-    #         # 'month'. Eg: "Title must be unique for pub_date year"
-    #         "%(field_label)s must be unique for "
-    #         "%(date_field_label)s %(lookup_type)s."
-    #     ),
-    # }
 
     def clean(self):
+        super().clean()
         errors = {}
-        if not self.name:
-            errors["name"] = "Employee name is required."
-        if not self.company:
-            errors["company"] = "Company is required."
-        if not self.department:
-            errors["department"] = "Department is required."
         if self.department and self.company and self.department.company_id != self.company_id:
             errors["department"] = "Department must belong to the selected company."
-        if not self.email:
-            errors["email"] = "Email is required."
-        # if not re.match(r"[^@]+@[^@]+\.[^@]+", self.email or ""):
-        #     errors["email"] = "Enter a valid email address."
-        if not self.mobile:
-            errors["mobile"] = "Mobile number is required."
         if not re.match(r"^\+?\d{10,15}$", self.mobile or ""):
             errors["mobile"] = "Enter a valid mobile number (10-15 digits, optional +)."
         if errors:

@@ -24,7 +24,7 @@ from drf_yasg import openapi
 schema_view = get_schema_view(
     openapi.Info(
         title="Employee Management System API",
-        default_version='v1',
+        default_version="v1",
         description="API documentation for EMS",
     ),
     public=True,
@@ -34,15 +34,12 @@ schema_view = get_schema_view(
 from core import frontend_views
 
 urlpatterns = [
-    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    path("swagger/", schema_view.with_ui("swagger", cache_timeout=0), name="schema-swagger-ui"),
+    path("redoc/", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"),
     path("admin/", admin.site.urls),
     path("", include("accounts.urls")),
     path("api/", include("core.api_urls")),
-    
     path("", frontend_views.landing, name="landing"),
-    
-    
     # Company management
     path("companies/", frontend_views.company_list, name="company_list"),
     path("companies/list/", frontend_views.company_list_partial, name="company_list_partial"),

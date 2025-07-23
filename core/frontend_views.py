@@ -71,7 +71,7 @@ def company_create(request):
             return render(request, "partials/success_marker.html", {"message": "Company saved successfully"})
     else:
         form = CompanyForm()
-    return render(request, "temp_modal.html", {"form": form, "action_url": "/companies/create/","form_page":"company_form.html","title":"Add Company Form"})
+    return render(request, "temp_modal.html", {"form": form, "action_url": "/companies/create/", "form_page": "company_form.html", "title": "Add Company Form"})
 
 
 @login_required
