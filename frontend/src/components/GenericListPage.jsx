@@ -1,8 +1,9 @@
 import EntityList from "./EntityList";
 import ConfirmModal from "./ConfirmModal";
 import EntityFormModal from "./EntityFormModal";
+import EntityViewModal from "./EntityViewModal";
 import Pagination from "./Pagination";
-import { Pencil, Trash } from "react-bootstrap-icons";
+import { Pencil, Trash, Eye } from "react-bootstrap-icons";
 import { useCrudList } from "../hooks/useCrudList";
 import useAuthStore from "../store/auth";
 
@@ -19,15 +20,17 @@ const GenericListPage = ({
   formFields,
   initialFormData = {},
   onFormDataTransform,
-  onDataTransformForDisplay, // Transform data for display (e.g., status values to labels)
+  onDataTransformForDisplay,
   validationSchema,
+  renderViewDetails,
 }) => {
   const user = useAuthStore((s) => s.user);
-  const { 
-    items, count, loading, error, currentPage, totalPages,
-    showDeleteModal, selectedItem, deleteLoading, handleDeleteClick, handleCloseDeleteModal, handleConfirmDelete,
-    showFormModal, editingItem, formData, formLoading, formError, handleAddClick, handleEditClick, handleCloseFormModal, handleFormSubmit,
-    handlePageChange 
+  const {
+    items,count,loading,error,currentPage,totalPages,
+    showDeleteModal,selectedItem,deleteLoading,deleteError,handleDeleteClick,handleCloseDeleteModal,handleConfirmDelete,
+    showFormModal,editingItem,formData,formLoading,formError,handleAddClick,handleEditClick,handleCloseFormModal,handleFormSubmit,
+    showViewModal,viewItem,viewLoading,viewError,handleShowViewModal,handleCloseViewModal,
+    handlePageChange,
   } = useCrudList({
     entityName,
     entityNamePlural,
@@ -52,8 +55,13 @@ const GenericListPage = ({
     handleDeleteClick(originalItem);
   };
 
-  // Only allow edit/delete for ADMIN or MANAGER
   const actions = [
+    {
+      label: 'View',
+      variant: 'info',
+      icon: <Eye className="me-2" />,
+      onClick: (item) => handleShowViewModal(item.id),
+    },
     {
       label: "Edit",
       variant: "primary",
@@ -73,9 +81,6 @@ const GenericListPage = ({
   // Transform data for display if a transformation function is provided
   const displayData = onDataTransformForDisplay ? onDataTransformForDisplay(items) : items;
 
-  // Determine if the current user has elevated privileges
-  const hasElevatedPrivileges = user && ["ADMIN", "MANAGER"].includes(user.role);
-
   return (
     <>
       <EntityList
@@ -84,10 +89,10 @@ const GenericListPage = ({
         data={displayData}
         loading={loading}
         error={error}
-        actions={hasElevatedPrivileges ? actions : []}
-        userRole={user?.role} // Pass role to EntityList for internal filtering
-        addLabel={hasElevatedPrivileges ? `Add ${entityName}` : null}
-        onAdd={hasElevatedPrivileges ? handleAddClick : null}
+        actions={actions}
+        userRole={user?.role}
+        addLabel={`Add ${entityName}`}
+        onAdd={handleAddClick}
         totalCount={count}
       />
 
@@ -106,6 +111,7 @@ const GenericListPage = ({
           onCancel={handleCloseDeleteModal}
           title="Confirm Deletion"
           loading={deleteLoading}
+          error={deleteError}
         >
           Are you sure you want to delete the {entityName.toLowerCase()} "
           <strong>{selectedItem?.name}</strong>"?
@@ -124,6 +130,18 @@ const GenericListPage = ({
           error={formError}
           submitLabel={editingItem ? "Update" : "Add"}
           validationSchema={validationSchema}
+        />
+      )}
+
+      {showViewModal && (
+        <EntityViewModal
+          show={showViewModal}
+          onHide={handleCloseViewModal}
+          entityName={entityName}
+          item={viewItem}
+          loading={viewLoading}
+          error={viewError}
+          renderDetails={renderViewDetails}
         />
       )}
     </>

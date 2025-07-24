@@ -1,5 +1,6 @@
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
+import { Navbar as BSNavbar, Nav, Container, Button } from 'react-bootstrap';
 import useAuthStore from "../store/auth";
 import useThemeStore from "../store/theme";
 import { Building, Diagram3, People, BoxArrowRight, Sun, Moon } from 'react-bootstrap-icons';
@@ -15,74 +16,73 @@ export default function Navbar() {
     navigate("/login");
   };
 
-  const getLinkClassName = ({ isActive }) =>
-    `nav-link px-3 py-2 rounded ${isActive ? "active fw-semibold" : ""}`;
-
   return (
-    <nav className="navbar navbar-expand-lg bg-body-tertiary shadow-sm">
-      <div className="container">
-        <NavLink className="navbar-brand fw-bold fs-3" to="/">
+    <BSNavbar expand="lg" bg="body-tertiary" className="shadow-sm">
+      <Container>
+        <BSNavbar.Brand as={NavLink} to="/" className="fw-bold fs-3">
           <Building className="me-2" />
           Employee MS
-        </NavLink>
-
-        <button
-          className="navbar-toggler border-0"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarEMS"
-          aria-controls="navbarEMS"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
-
-        <div className="collapse navbar-collapse" id="navbarEMS">
+        </BSNavbar.Brand>
+        
+        <BSNavbar.Toggle aria-controls="basic-navbar-nav" className="border-0" />
+        
+        <BSNavbar.Collapse id="basic-navbar-nav">
           {token && (
-            <>
-              <ul className="navbar-nav ms-auto align-items-lg-center">
-                <li className="nav-item mx-1">
-                  <NavLink to="/companies" className={getLinkClassName}>
-                    <Building className="me-2" />
-                    Companies
-                  </NavLink>
-                </li>
-                <li className="nav-item mx-1">
-                  <NavLink to="/departments" className={getLinkClassName}>
-                    <Diagram3 className="me-2" />
-                    Departments
-                  </NavLink>
-                </li>
-                <li className="nav-item mx-1">
-                  <NavLink to="/employees" className={getLinkClassName}>
-                    <People className="me-2" />
-                    Employees
-                  </NavLink>
-                </li>
-                <li className="nav-item ms-lg-3">
-                  <button
-                    className="btn btn-sm btn-outline-secondary"
-                    onClick={handleLogout}
-                  >
-                    <BoxArrowRight className="me-2" />
-                    Logout
-                  </button>
-                </li>
-                <li className="nav-item d-flex align-items-center ms-lg-3">
-                  <button
-                    onClick={toggleTheme}
-                    className="btn btn-sm btn-outline-secondary"
-                    title="Toggle Theme"
-                  >
-                    {theme === "dark" ? <Sun /> : <Moon />}
-                  </button>
-                </li>
-              </ul>
-            </>
+            <Nav className="ms-auto align-items-lg-center">
+              <Nav.Item className="mx-1">
+                <Nav.Link as={NavLink} to="/companies" className={({ isActive }) => 
+                  `px-3 py-2 rounded ${isActive ? "active fw-semibold" : ""}`
+                }>
+                  <Building className="me-2" />
+                  Companies
+                </Nav.Link>
+              </Nav.Item>
+              
+              <Nav.Item className="mx-1">
+                <Nav.Link as={NavLink} to="/departments" className={({ isActive }) => 
+                  `px-3 py-2 rounded ${isActive ? "active fw-semibold" : ""}`
+                }>
+                  <Diagram3 className="me-2" />
+                  Departments
+                </Nav.Link>
+              </Nav.Item>
+              
+              <Nav.Item className="mx-1">
+                <Nav.Link as={NavLink} to="/employees" className={({ isActive }) => 
+                  `px-3 py-2 rounded ${isActive ? "active fw-semibold" : ""}`
+                }>
+                  <People className="me-2" />
+                  Employees
+                </Nav.Link>
+              </Nav.Item>
+              
+              <Nav.Item className="ms-lg-3 mt-2 mt-lg-0">
+                <Button 
+                  variant="outline-secondary" 
+                  size="sm" 
+                  className="w-100"
+                  onClick={handleLogout}
+                >
+                  <BoxArrowRight className="me-2" />
+                  Logout
+                </Button>
+              </Nav.Item>
+              
+              <Nav.Item className="d-flex align-items-center ms-lg-3 mt-2 mt-lg-0">
+                <Button
+                  variant="outline-secondary"
+                  size="sm"
+                  className="w-100"
+                  onClick={toggleTheme}
+                  title="Toggle Theme"
+                >
+                  {theme === "dark" ? <Sun /> : <Moon />}
+                </Button>
+              </Nav.Item>
+            </Nav>
           )}
-        </div>
-      </div>
-    </nav>
+        </BSNavbar.Collapse>
+      </Container>
+    </BSNavbar>
   );
 }

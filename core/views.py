@@ -3,7 +3,9 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.core.exceptions import ValidationError
 from .models import Company, Department, Employee
-from .serializers import CompanySerializer, DepartmentSerializer, EmployeeSerializer
+from .serializers import (
+    CompanySerializer, DepartmentSerializer, EmployeeSerializer, CompanyDetailSerializer, DepartmentDetailSerializer,
+)
 from .permissions import IsAdmin, IsManager, IsEmployee
 
 # --- Custom JWT Login View ---
@@ -23,10 +25,22 @@ from django.db.models import Count
 
 
 class CompanyViewSet(viewsets.ModelViewSet):
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if self.action == 'retrieve':
+            # Prefetch related departments and their employees to prevent N+1 queries
+            return queryset.prefetch_related('department_set__employee_set')
+        return queryset
+
+    def get_serializer_class(self):
+        if self.action == 'retrieve':
+            return CompanyDetailSerializer
+        return CompanySerializer
+    
     queryset = Company.objects.annotate(
         _num_departments=Count("department", distinct=True),
         _num_employees=Count("employee", distinct=True)
-    ).all().order_by('-id')
+    ).order_by("-id")
     serializer_class = CompanySerializer
     permission_classes = [IsAdmin]
 
@@ -46,6 +60,18 @@ class CompanyViewSet(viewsets.ModelViewSet):
 
 
 class DepartmentViewSet(viewsets.ModelViewSet):
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if self.action == 'retrieve':
+            # Prefetch related employees to prevent N+1 queries
+            return queryset.prefetch_related('employee_set')
+        return queryset
+
+    def get_serializer_class(self):
+        if self.action == 'retrieve':
+            return DepartmentDetailSerializer
+        return DepartmentSerializer
+
     queryset = Department.objects.select_related("company").all()
     serializer_class = DepartmentSerializer
     permission_classes = [IsManager | IsAdmin]
@@ -80,6 +106,7 @@ class DepartmentViewSet(viewsets.ModelViewSet):
 
 
 class EmployeeViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsManager]
     queryset = Employee.objects.select_related("company", "department").all()
     serializer_class = EmployeeSerializer
 

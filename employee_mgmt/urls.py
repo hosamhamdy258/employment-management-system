@@ -31,33 +31,10 @@ schema_view = get_schema_view(
     permission_classes=(permissions.AllowAny,),
 )
 
-from core import frontend_views
-
 urlpatterns = [
     path("swagger/", schema_view.with_ui("swagger", cache_timeout=0), name="schema-swagger-ui"),
     path("redoc/", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"),
     path("admin/", admin.site.urls),
     path("", include("accounts.urls")),
     path("api/", include("core.api_urls")),
-    path("", frontend_views.landing, name="landing"),
-    # Company management
-    path("companies/", frontend_views.company_list, name="company_list"),
-    path("companies/list/", frontend_views.company_list_partial, name="company_list_partial"),
-    path("companies/create/", frontend_views.company_create, name="company_create"),
-    path("companies/<int:pk>/edit/", frontend_views.company_edit, name="company_edit"),
-    path("companies/<int:pk>/delete/", frontend_views.company_delete, name="company_delete"),
-    # Department management
-    path("departments/", frontend_views.department_list, name="department_list"),
-    path("departments/list/", frontend_views.department_list_partial, name="department_list_partial"),
-    path("departments/create/", frontend_views.department_create, name="department_create"),
-    path("departments/<int:pk>/edit/", frontend_views.department_edit, name="department_edit"),
-    path("departments/<int:pk>/delete/", frontend_views.department_delete, name="department_delete"),
-    # Employee management
-    path("employees/", frontend_views.employee_list, name="employee_list"),
-    path("employees/list/", frontend_views.employee_list_partial, name="employee_list_partial"),
-    path("employees/create/", frontend_views.employee_create, name="employee_create"),
-    path("employees/<int:pk>/edit/", frontend_views.employee_edit, name="employee_edit"),
-    path("employees/<int:pk>/delete/", frontend_views.employee_delete, name="employee_delete"),
-    # HTMX endpoint for dynamic department dropdown
-    path("departments/by_company/", frontend_views.departments_by_company, name="departments_by_company"),
 ]

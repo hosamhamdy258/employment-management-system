@@ -11,7 +11,12 @@ export default function EntityList({
   addLabel = "Add",
   onAdd,
   totalCount = 0,
+  userRole,
 }) {
+
+  const filteredActions = actions.filter(
+    (action) => !action.roles || (userRole && action.roles.includes(userRole))
+  );
 
   return (
     <>
@@ -41,7 +46,7 @@ export default function EntityList({
       <div className="card shadow">
         <div className="card-body p-0">
           <div className="table-responsive">
-            <table className="table">
+            <table className="table table-hover table-striped table-sm align-middle">
               <thead>
                 <tr>
                   {columns.map((col) => (
@@ -88,10 +93,10 @@ export default function EntityList({
                           </div>
                         </td>
                       ))}
-                      {actions.length > 0 && (
+                      {filteredActions.length > 0 && (
                         <td className="py-3 px-4 border-secondary">
                           <div className="d-flex justify-content-center gap-2 flex-wrap">
-                            {actions.map((action, i) => (
+                            {filteredActions.map((action, i) => (
                               <button
                                 key={i}
                                 className="btn btn-sm btn-outline-secondary"

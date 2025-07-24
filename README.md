@@ -1,130 +1,100 @@
 # Employee Management System (EMS)
 
-A modern Django-based Employee Management System with role-based access, dynamic Bootstrap/HTMX frontend, REST API, and auto-generated Swagger documentation.
-
----
+A full-stack Employee Management System built with Django and React. It features role-based access control, a complete REST API, and a clean, modern user interface.
 
 ## Features
-- Custom user model (email login, roles: Admin/Manager/Employee)
-- CRUD for Company, Department, Employee
-- Role-based access control (frontend and API)
-- HTMX-powered dynamic UI (no page reloads)
-- Bootstrap 5 styling, toasts for all feedback
-- Dynamic department dropdown in employee form
-- Django admin for all models
-- REST API (DRF) for all entities
-- Interactive API docs (Swagger/Redoc)
-- Demo data script for easy setup
 
----
+- **Full CRUD Operations** for Companies, Departments, and Employees.
+- **RESTful API** with interactive documentation via Swagger and ReDoc.
+- **Role-Based Access Control (RBAC)** with three default roles: Admin, Manager, and Employee.
+- **JWT Authentication** for secure communication between the frontend and backend.
+- **Frontend Interface** built as a Single Page Application (SPA) using React.
+- **Containerized Environment** using Docker and Docker Compose for easy setup and deployment.
 
-## Quick Start
+## Technology Stack
 
-### 1. Clone & Install Dependencies
-```bash
-pip install -r requirements.txt
-```
+- **Backend**: Django, Django REST Framework, SQLite
+- **Frontend**: React, Vite, Zustand, Axios, React Router
+- **Styling**: Bootstrap 5 (No custom CSS)
+- **API Documentation**: drf-yasg (for Swagger/ReDoc)
+- **Containerization**: Docker, Docker Compose
 
-### 2. Apply Migrations
-```bash
-python manage.py migrate
-```
+## Getting Started
 
-### 3. Populate Demo Data
-```bash
-python demo_data.py
-```
-- Companies, departments, employees, and demo users will be created.
-- Demo users:
-  - **admin@demo.com** (role: ADMIN, password: `test`)
-  - **manager@demo.com** (role: MANAGER, password: `test`)
-  - **employee@demo.com** (role: EMPLOYEE, password: `test`)
+Follow these instructions to get the development environment up and running on your local machine.
 
-### 4. Run the Development Server
-```bash
-python manage.py runserver
-```
+### Prerequisites
 
-- App: [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
-- Admin: [http://127.0.0.1:8000/admin/](http://127.0.0.1:8000/admin/)
-- Swagger: [http://127.0.0.1:8000/swagger/](http://127.0.0.1:8000/swagger/)
-- Redoc: [http://127.0.0.1:8000/redoc/](http://127.0.0.1:8000/redoc/)
+- Docker
+- Docker Compose
 
----
+### Installation and Setup
 
-## Usage
-- Login as any demo user (see above)
-- Manage companies, departments, and employees
-- Only Admins/Managers can create/edit/delete
-- Employees can view their own info
-- All actions provide instant feedback via Bootstrap toasts
+1.  **Clone the Repository**
 
----
+    ```bash
+    git clone <your-repository-url>
+    cd <repository-folder>
+    ```
 
-## React Frontend (Vite SPA)
+2.  **Start the Application**
 
-The EMS frontend is a modern React SPA built with Vite, Zustand, Axios, React Router, and Bootstrap 5. It replaces the legacy HTMX UI and connects to the Django REST API for all operations.
+    Use Docker Compose to build and run the containers for the backend and frontend.
 
-### Setup & Run (Development)
+    ```bash
+    docker-compose up --build
+    ```
 
-```bash
-cd frontend
-npm install
-npm run dev
-```
-- App: [http://localhost:5173/](http://localhost:5173/)
+3.  **Access the Application**
 
-### Features
-- Full SPA: Companies, Departments, Employees CRUD
-- JWT authentication (login/logout)
-- Role-based UI (Admin/Manager/Employee)
-- Toast notifications for all actions
-- Dynamic dropdowns (e.g., departments by company)
-- Protected routes (React Router)
-- Zustand for state management
-- Bootstrap 5 styling
+    Once the containers are running, you can access the different parts of the system:
 
-### Integration with Django Backend
-- The React app expects the Django backend to be running at `http://127.0.0.1:8000/` by default.
-- API base URL is configured in `frontend/src/api/axios.js`. Update if your backend runs elsewhere.
-- All API endpoints require authentication (JWT). Login via the React UI to obtain a token.
+    -   **Frontend Application**: [http://localhost:5173](http://localhost:5173)
+    -   **API Docs (Swagger)**: [http://localhost:8000/swagger/](http://localhost:8000/swagger/)
+    -   **API Docs (ReDoc)**: [http://localhost:8000/redoc/](http://localhost:8000/redoc/)
 
-### Build for Production
-```bash
-cd frontend
-npm run build
-```
-- Output will be in `frontend/dist/`. You can serve this with any static file server or integrate with Django static files.
+4.  **Login with Demo Accounts**
 
-### Troubleshooting
-- Ensure backend is running before using the React app.
-- If API requests fail, check CORS settings in Django and the API base URL in `frontend/src/api/axios.js`.
-- For more details, see `frontend/README.md` (Vite/React info).
+    The system is pre-populated with demo users. You can log in with the following credentials:
 
----
+    -   **Admin**: `admin@demo.com` / `test`
+    -   **Manager**: `manager@demo.com` / `test`
+    -   **Employee**: `employee@demo.com` / `test`
+
+## Security Implementation
+
+Security is a core component of this application, implemented through JWT and a role-based access control (RBAC) system.
+
+-   **Authentication**: Users are authenticated using JSON Web Tokens (JWT). The login endpoint provides an access and refresh token pair to the client.
+-   **Authorization**: The API endpoints are protected based on user roles. Permissions are defined in the Django backend to restrict access to certain operations (create, update, delete) to authorized roles (Admin, Manager).
+-   **Token Handling**: The React frontend securely stores the JWTs and includes them in the authorization header for all API requests. It also handles token expiration and refreshing automatically.
 
 ## API Documentation
-- **Swagger UI:** `/swagger/`
-- **Redoc:** `/redoc/`
-- Full RESTful CRUD for Company, Department, Employee
-- Auth required for all endpoints
 
----
+The REST API is fully documented and explorable. The documentation is automatically generated from the code and can be accessed at the following endpoints:
 
-## Project Structure
-- `accounts/` — Custom user model and logic
-- `core/` — Main business models, views, API, demo data
-- `templates/` — Bootstrap/HTMX frontend
-- `demo_data.py` — Demo data script
+-   **Swagger UI**: [http://localhost:8000/swagger/](http://localhost:8000/swagger/)
+-   **ReDoc**: [http://localhost:8000/redoc/](http://localhost:8000/redoc/)
 
----
+These interfaces provide detailed information about each endpoint, including the required parameters, request body structure, and expected responses.
 
-## Security & Notes
-- CSRF protection for all forms and HTMX requests
-- Demo user passwords are set to `test` (change in production!)
-- No custom CSS; all styling via Bootstrap 5
+## Project Checklist
 
----
+### Backend Requirements
+- [x] **Models**: User, Company, Department, Employee
+- [x] **Validations**: Required fields, email/mobile formats.
+- [x] **Business Logic**: Automatic calculation of employee/department counts and days employed.
+- [x] **Security**: Role-based access control and JWT authentication.
+- [x] **APIs**: Full RESTful API for all models.
+- [ ] **Workflow (Bonus)**: Onboarding process for new employees.
+- [ ] **Testing (Bonus)**: Unit and integration tests.
+- [ ] **Logging (Bonus)**: Application logging.
 
-## License
-MIT (or your license here)
+### Frontend Requirements
+- [x] **UI**: Login, Company, Department, and Employee management pages.
+- [x] **Validations**: Form validation for required fields and formats.
+- [x] **API Integration**: Frontend is fully integrated with the backend API.
+- [x] **Error Handling**: Server-side errors are handled and displayed to the user.
+- [ ] **User Account Management (Bonus)**: Edit/View user account pages.
+- [ ] **Summary Dashboard (Bonus)**: Dashboard with analytics.
+- [ ] **Employee Report (Bonus)**: Detailed report of hired employees.

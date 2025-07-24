@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 import re
 
 
-class RequiredFieldsModel(models.Model):
+class BaseModel(models.Model):
     required_fields = []
 
     class Meta:
@@ -21,7 +21,7 @@ class RequiredFieldsModel(models.Model):
             raise ValidationError(errors)
 
 
-class Company(RequiredFieldsModel):
+class Company(BaseModel):
     required_fields = ["name"]
     name = models.CharField(max_length=255, unique=True)
 
@@ -45,12 +45,12 @@ class Company(RequiredFieldsModel):
         return self.name
 
 
-class Department(RequiredFieldsModel):
+class Department(BaseModel):
     required_fields = ["company", "name"]
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
 
-    class Meta(RequiredFieldsModel.Meta):
+    class Meta(BaseModel.Meta):
         unique_together = ("company", "name")
 
     def clean(self):
@@ -78,7 +78,7 @@ class Department(RequiredFieldsModel):
         return f"{self.name} ({self.company.name})"
 
 
-class Employee(RequiredFieldsModel):
+class Employee(BaseModel):
     required_fields = ["company", "department", "name", "email", "mobile"]
 
     class Status(models.TextChoices):
@@ -91,7 +91,7 @@ class Employee(RequiredFieldsModel):
     department = models.ForeignKey(Department, on_delete=models.PROTECT)
     status = models.CharField(max_length=30, choices=Status.choices, default=Status.APPLICATION_RECEIVED)
     name = models.CharField(max_length=255)
-    email = models.EmailField()
+    email = models.EmailField(unique=True)
     mobile = models.CharField(max_length=20)
     address = models.TextField(blank=True)
     designation = models.CharField(max_length=255)
@@ -102,16 +102,22 @@ class Employee(RequiredFieldsModel):
         errors = {}
         if self.department and self.company and self.department.company_id != self.company_id:
             errors["department"] = "Department must belong to the selected company."
-        if not re.match(r"^\+?\d{10,15}$", self.mobile or ""):
-            errors["mobile"] = "Enter a valid mobile number (10-15 digits, optional +)."
+        if not re.match(r"^\+?[1-9]\d{9,14}$", self.mobile or ""):
+            errors["mobile"] = "Enter a valid E.164 mobile number (e.g., +14155552671)."
         if errors:
             raise ValidationError(errors)
+
+    def save(self, *args, **kwargs):
+        # Automatically set hired_on date when status is 'HIRED' and date is not already set.
+        if self.status == self.Status.HIRED and self.hired_on is None:
+            self.hired_on = timezone.now().date()
+        super().save(*args, **kwargs)
 
     @property
     def days_employed(self):
         if self.hired_on:
             return (timezone.now().date() - self.hired_on).days
-        return None
+        return 0
 
     def __str__(self):
         return f"{self.name} ({self.company.name} - {self.department.name})"

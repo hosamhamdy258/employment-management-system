@@ -14,6 +14,30 @@ export const createCrudSlice = (config) => (set) => {
     allItemsLoading: false,
     error: "",
 
+    viewItem: null,
+    viewLoading: false,
+    viewError: "",
+
+    fetchItemById: async (id) => {
+      set((state) => {
+        state[sliceName].viewLoading = true;
+        state[sliceName].viewError = "";
+        state[sliceName].viewItem = null;
+      });
+      try {
+        const res = await api.get(`${endpoint}${id}/`);
+        set((state) => {
+          state[sliceName].viewItem = res.data;
+          state[sliceName].viewLoading = false;
+        });
+      } catch (err) {
+        set((state) => {
+          state[sliceName].viewError = err.response?.data?.detail || `Failed to load ${entityName}`;
+          state[sliceName].viewLoading = false;
+        });
+      }
+    },
+
     fetchItems: async (page = 1) => {
       set((state) => {
         state[sliceName].loading = true;

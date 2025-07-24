@@ -13,15 +13,20 @@ export const useCrudList = ({
   initialFormData = {},
   onFormDataTransform = (data) => data, // Transform data before editing
 }) => {
+  // Select state and actions from the store
   const {
     items,
     count,
     loading,
     error,
+    viewItem,
+    viewLoading,
+    viewError,
     fetchItems,
     deleteItem,
     addItem,
     updateItem,
+    fetchItemById,
   } = useStore((state) => state[entityNamePlural]);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -30,7 +35,8 @@ export const useCrudList = ({
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
-  
+  const [deleteError, setDeleteError] = useState(null);
+
   // Form modal state
   const [showFormModal, setShowFormModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
@@ -38,7 +44,9 @@ export const useCrudList = ({
   const [formLoading, setFormLoading] = useState(false);
   const [formError, setFormError] = useState('');
 
-  
+  // View modal state
+  const [showViewModal, setShowViewModal] = useState(false);
+
   useEffect(() => {
     fetchItems(currentPage);
   }, [currentPage, fetchItems]);
@@ -46,12 +54,15 @@ export const useCrudList = ({
   // Delete handlers
   const handleDeleteClick = (item) => {
     setSelectedItem(item);
+    setDeleteError(null); // Clear previous errors
     setShowDeleteModal(true);
   };
+
 
   const handleCloseDeleteModal = () => {
     setShowDeleteModal(false);
     setSelectedItem(null);
+    setDeleteError(null); // Clear error on close
   };
 
   const handleConfirmDelete = async () => {
@@ -66,7 +77,7 @@ export const useCrudList = ({
         fetchItems(currentPage);
       }
     } else {
-      // Optionally, set a UI error state or log
+      setDeleteError(result.error || `Failed to delete ${entityName.toLowerCase()}.`);
     }
     setDeleteLoading(false);
   };
@@ -115,6 +126,16 @@ export const useCrudList = ({
     setFormLoading(false);
   };
 
+  // View modal handlers
+  const handleShowViewModal = (id) => {
+    setShowViewModal(true);
+    fetchItemById(id);
+  };
+
+  const handleCloseViewModal = () => {
+    setShowViewModal(false);
+  };
+
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
@@ -134,6 +155,7 @@ export const useCrudList = ({
     showDeleteModal,
     selectedItem,
     deleteLoading,
+    deleteError,
     handleDeleteClick,
     handleCloseDeleteModal,
     handleConfirmDelete,
@@ -148,6 +170,14 @@ export const useCrudList = ({
     handleEditClick,
     handleCloseFormModal,
     handleFormSubmit,
+
+    // View modal
+    showViewModal,
+    viewItem,
+    viewLoading,
+    viewError,
+    handleShowViewModal,
+    handleCloseViewModal,
     
     // Pagination
     handlePageChange,

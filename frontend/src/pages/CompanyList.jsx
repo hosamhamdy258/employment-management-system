@@ -1,10 +1,12 @@
 import React from 'react';
 import GenericListPage from '../components/GenericListPage';
-
+import CompanyDetails from '../components/details/CompanyDetails';
 import { companySchema } from '../utils/formValidation';
 
 const columns = [
   { field: 'name', label: 'Name' },
+  { field: 'num_departments', label: 'Departments' },
+  { field: 'num_employees', label: 'Employees' },
 ];
 
 const formFields = [
@@ -28,6 +30,7 @@ export default function CompanyList() {
       formFields={formFields}
       initialFormData={initialFormData}
       validationSchema={companySchema}
+      renderViewDetails={(data) => <CompanyDetails data={data} />}
     />
   );
 }

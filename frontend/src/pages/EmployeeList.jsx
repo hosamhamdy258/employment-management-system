@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo } from 'react';
 import GenericListPage from '../components/GenericListPage';
+import EmployeeDetails from '../components/details/EmployeeDetails';
 import useStore from '../store/store';
 import useChoicesStore from '../store/choices';
 import { employeeSchema } from '../utils/formValidation';
@@ -157,8 +158,8 @@ export default function EmployeeList() {
       initialFormData={initialFormData}
       onFormDataTransform={onFormDataTransform}
       onDataTransformForDisplay={transformEmployeeDataForDisplay}
-
       validationSchema={employeeSchema}
+      renderViewDetails={(data) => <EmployeeDetails data={data} />}
     />
   );
 }

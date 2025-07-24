@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import GenericListPage from '../components/GenericListPage';
+import DepartmentDetails from '../components/details/DepartmentDetails';
 import useStore from '../store/store';
 import { departmentSchema } from '../utils/formValidation';
 
@@ -98,8 +99,8 @@ export default function DepartmentList() {
       formFields={finalFormFields}
       initialFormData={initialFormData}
       onFormDataTransform={onFormDataTransform}
-      // Remove additionalStores to avoid conflicts
       validationSchema={departmentSchema}
+      renderViewDetails={(data) => <DepartmentDetails data={data} />}
     />
   );
 

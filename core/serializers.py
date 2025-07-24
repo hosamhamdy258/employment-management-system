@@ -33,4 +33,28 @@ class EmployeeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Employee
-        fields = ["id", "company", "company_name", "department", "department_name", "status", "name", "email", "mobile", "address", "designation", "hired_on", "days_employed"]
+        fields = '__all__'
+
+
+class EmployeeNestedSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Employee
+        fields = ('id', 'name', 'department_name', 'hired_on')
+    
+    department_name = serializers.CharField(source='department.name', read_only=True)
+
+
+class DepartmentDetailSerializer(DepartmentSerializer):
+    employees = EmployeeNestedSerializer(many=True, read_only=True, source='employee_set')
+
+    class Meta(DepartmentSerializer.Meta):
+        fields = list(DepartmentSerializer.Meta.fields) + ['employees']
+
+
+class CompanyDetailSerializer(CompanySerializer):
+    departments = DepartmentDetailSerializer(many=True, read_only=True, source='department_set')
+
+    class Meta(CompanySerializer.Meta):
+        fields = list(CompanySerializer.Meta.fields) + ['departments']
+
+
