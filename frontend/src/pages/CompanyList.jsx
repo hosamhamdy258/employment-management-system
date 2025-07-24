@@ -31,6 +31,9 @@ export default function CompanyList() {
       initialFormData={initialFormData}
       validationSchema={companySchema}
       renderViewDetails={(data) => <CompanyDetails data={data} />}
+      addRoles={['ADMIN']}
+      editRoles={['ADMIN']}
+      deleteRoles={['ADMIN']}
     />
   );
 }

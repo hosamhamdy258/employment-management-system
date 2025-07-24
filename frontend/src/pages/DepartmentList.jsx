@@ -101,6 +101,9 @@ export default function DepartmentList() {
       onFormDataTransform={onFormDataTransform}
       validationSchema={departmentSchema}
       renderViewDetails={(data) => <DepartmentDetails data={data} />}
+      addRoles={['ADMIN', 'MANAGER']}
+      editRoles={['ADMIN', 'MANAGER']}
+      deleteRoles={['ADMIN', 'MANAGER']}
     />
   );
 

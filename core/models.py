@@ -1,8 +1,13 @@
 from django.db import models
+from django.db.models import UniqueConstraint
+from django.db.models.functions import Lower
 from django.conf import settings
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 import re
+
+LARGE_CHAR_MAX_LENGTH = 255
+SMALL_CHAR_MAX_LENGTH = 30
 
 
 class BaseModel(models.Model):
@@ -23,7 +28,7 @@ class BaseModel(models.Model):
 
 class Company(BaseModel):
     required_fields = ["name"]
-    name = models.CharField(max_length=255, unique=True)
+    name = models.CharField(max_length=LARGE_CHAR_MAX_LENGTH, unique=True)
 
     def delete(self, *args, **kwargs):
         # Prevent deletion if company has departments or employees
@@ -48,10 +53,17 @@ class Company(BaseModel):
 class Department(BaseModel):
     required_fields = ["company", "name"]
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=LARGE_CHAR_MAX_LENGTH)
 
     class Meta(BaseModel.Meta):
-        unique_together = ("company", "name")
+        constraints = [
+            UniqueConstraint(
+                Lower('name'),
+                'company',
+                name='unique_department_name_in_company',
+                violation_error_message='A department with this name already exists in this company.'
+            )
+        ]
 
     def clean(self):
         super().clean()
@@ -89,13 +101,23 @@ class Employee(BaseModel):
 
     company = models.ForeignKey(Company, on_delete=models.PROTECT)
     department = models.ForeignKey(Department, on_delete=models.PROTECT)
-    status = models.CharField(max_length=30, choices=Status.choices, default=Status.APPLICATION_RECEIVED)
-    name = models.CharField(max_length=255)
+    status = models.CharField(max_length=SMALL_CHAR_MAX_LENGTH, choices=Status.choices, default=Status.APPLICATION_RECEIVED)
+    name = models.CharField(max_length=LARGE_CHAR_MAX_LENGTH)
     email = models.EmailField(unique=True)
-    mobile = models.CharField(max_length=20)
+    mobile = models.CharField(max_length=SMALL_CHAR_MAX_LENGTH, unique=True)
     address = models.TextField(blank=True)
-    designation = models.CharField(max_length=255)
+    designation = models.CharField(max_length=LARGE_CHAR_MAX_LENGTH)
     hired_on = models.DateField(null=True, blank=True)
+
+    class Meta(BaseModel.Meta):
+        constraints = [
+            UniqueConstraint(
+                Lower('name'),
+                'department',
+                name='unique_employee_name_in_department',
+                violation_error_message='An employee with this name already exists in this department.'
+            )
+        ]
 
     def clean(self):
         super().clean()

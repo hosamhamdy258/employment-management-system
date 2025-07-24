@@ -91,10 +91,7 @@ const EntityForm = ({
   }
 
   return (
-    <div className="card shadow-sm">
-      <div className="card-body p-4">
-
-        <Form onSubmit={handleSubmit(onSubmit)} noValidate>
+    <Form onSubmit={handleSubmit(onSubmit)} noValidate className="p-1">
           {filteredFields.map((field) => {
             // Determine error message: prefer react-hook-form error, then backend error
             let fieldError = errors[field.name]?.message;
@@ -166,8 +163,6 @@ const EntityForm = ({
             </Button>
           </div>
         </Form>
-      </div>
-    </div>
   );
 };
 

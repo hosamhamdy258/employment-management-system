@@ -23,6 +23,9 @@ const GenericListPage = ({
   onDataTransformForDisplay,
   validationSchema,
   renderViewDetails,
+  addRoles = [],
+  editRoles = [],
+  deleteRoles = [],
 }) => {
   const user = useAuthStore((s) => s.user);
   const {
@@ -38,20 +41,19 @@ const GenericListPage = ({
     onFormDataTransform,
   });
 
-
+  // Determine user permissions
+  const canAdd = user && addRoles.includes(user.role);
+  const canEdit = user && editRoles.includes(user.role);
+  const canDelete = user && deleteRoles.includes(user.role);
 
   // Create wrapper functions to ensure original data is passed to handlers
   const handleEditClickWrapper = (displayItem) => {
-    // Find the original item by ID to ensure we pass untransformed data
-    const originalItem =
-      items.find((item) => item.id === displayItem.id) || displayItem;
+    const originalItem = items.find((item) => item.id === displayItem.id) || displayItem;
     handleEditClick(originalItem);
   };
 
   const handleDeleteClickWrapper = (displayItem) => {
-    // Find the original item by ID to ensure we pass untransformed data
-    const originalItem =
-      items.find((item) => item.id === displayItem.id) || displayItem;
+    const originalItem = items.find((item) => item.id === displayItem.id) || displayItem;
     handleDeleteClick(originalItem);
   };
 
@@ -61,22 +63,23 @@ const GenericListPage = ({
       variant: 'info',
       icon: <Eye className="me-2" />,
       onClick: (item) => handleShowViewModal(item.id),
+      show: true, // Always show view
     },
     {
       label: "Edit",
       variant: "primary",
       icon: <Pencil className="me-2" />,
       onClick: handleEditClickWrapper,
-      roles: ["ADMIN", "MANAGER"],
+      show: canEdit,
     },
     {
       label: "Delete",
       variant: "danger",
       icon: <Trash className="me-2" />,
       onClick: handleDeleteClickWrapper,
-      roles: ["ADMIN", "MANAGER"],
+      show: canDelete,
     },
-  ]
+  ].filter(action => action.show);
 
   // Transform data for display if a transformation function is provided
   const displayData = onDataTransformForDisplay ? onDataTransformForDisplay(items) : items;
@@ -90,9 +93,8 @@ const GenericListPage = ({
         loading={loading}
         error={error}
         actions={actions}
-        userRole={user?.role}
         addLabel={`Add ${entityName}`}
-        onAdd={handleAddClick}
+        onAdd={canAdd ? handleAddClick : null} // Pass null if user can't add
         totalCount={count}
       />
 

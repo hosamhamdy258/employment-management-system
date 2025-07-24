@@ -69,6 +69,17 @@ Security is a core component of this application, implemented through JWT and a 
 -   **Authorization**: The API endpoints are protected based on user roles. Permissions are defined in the Django backend to restrict access to certain operations (create, update, delete) to authorized roles (Admin, Manager).
 -   **Token Handling**: The React frontend securely stores the JWTs and includes them in the authorization header for all API requests. It also handles token expiration and refreshing automatically.
 
+## Roles and Permissions
+
+The application uses a role-based access control system to manage user permissions. Here is a breakdown of what each role can do:
+
+| Feature / Resource	| Admin				| Manager				| Employee	|
+| ------------------	| -------------------------------------------	| -------------------------------------------	| -------------	|
+| Dashboard		| ✅ View			| ✅ View			| ✅ View	|
+| Companies		| ⭐️ Full Access (Create, View, Edit, Delete)	| ✅ View Only			| ✅ View Only	|
+| Departments		| ⭐️ Full Access			| ⭐️ Full Access (Create, View, Edit, Delete)	| ✅ View Only	|
+| Employees		| ⭐️ Full Access			| ⭐️ Full Access (Create, View, Edit, Delete)	| ❌ No Access	|
+
 ## API Documentation
 
 The REST API is fully documented and explorable. The documentation is automatically generated from the code and can be accessed at the following endpoints:
@@ -98,3 +109,11 @@ These interfaces provide detailed information about each endpoint, including the
 - [ ] **User Account Management (Bonus)**: Edit/View user account pages.
 - [x] **Summary Dashboard (Bonus)**: Dashboard with analytics.
 - [ ] **Employee Report (Bonus)**: Detailed report of hired employees.
+
+## Future Improvements [ No estimated time]
+- [] apply optimistic updates instead of refetching all data after actions
+- [] apply caching with TanStack Query or relevant library
+- [] added search and sorting to the table
+- [] combined front and back docker image into one for easy deployment
+- [] optimize docker image for production ready
+- [] Automatic build and serve build files directory from Nginx and django

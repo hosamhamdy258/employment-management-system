@@ -4,22 +4,28 @@
  */
 
 
-
 import { z } from "zod";
+
+// Validation Constants from backend
+const NAME_MAX_LENGTH = 255;
+const DESIGNATION_MAX_LENGTH = 255;
+const MOBILE_MAX_LENGTH = 30;
+const EMAIL_MAX_LENGTH = 254;
+const ADDRESS_MAX_LENGTH = 255;
 
 // Zod schemas for each entity
 export const companySchema = z.object({
   name: z
     .string()
     .min(1, "Company name is required")
-    .max(100, "Max 100 characters"),
+    .max(NAME_MAX_LENGTH, `Max ${NAME_MAX_LENGTH} characters`),
 });
 
 export const departmentSchema = z.object({
   name: z
     .string()
     .min(1, "Department name is required")
-    .max(100, "Max 100 characters"),
+    .max(NAME_MAX_LENGTH, `Max ${NAME_MAX_LENGTH} characters`),
   company: z.union([z.string().min(1, "Company is required"), z.number()]),
 });
 
@@ -28,29 +34,38 @@ export const employeeSchema = z.object({
   name: z
     .string()
     .min(1, "Employee name is required")
-    .max(100, "Max 100 characters"),
+    .max(NAME_MAX_LENGTH, `Max ${NAME_MAX_LENGTH} characters`),
   email: z
     .string()
     .email("Invalid email address")
-    .max(254, "Max 254 characters"),
-  // Mobile: must be E.164 format (starts with +, 10-15 digits), or blank
+    .max(EMAIL_MAX_LENGTH, `Max ${EMAIL_MAX_LENGTH} characters`),
   mobile: z
     .string()
     .min(1, "Mobile number is required")
+    .max(MOBILE_MAX_LENGTH, `Max ${MOBILE_MAX_LENGTH} characters`)
     .refine((val) => /^\+?[1-9]\d{9,14}$/.test(val), {
       message:
         "Please enter a valid mobile number (E.164 format, 10-15 digits, optional +).",
     }),
   address: z.string()
-    .min(1, "Address is required")
-    .max(255, "Max 255 characters"),
+    .max(ADDRESS_MAX_LENGTH, `Max ${ADDRESS_MAX_LENGTH} characters`)
+    .optional()
+    .or(z.literal('')), // Allows empty string
+  designation: z.string()
+    .min(1, "Designation is required")
+    .max(DESIGNATION_MAX_LENGTH, `Max ${DESIGNATION_MAX_LENGTH} characters`),
   company: z.union([z.string().min(1, "Company is required"), z.number()]),
   department: z.union([
     z.string().min(1, "Department is required"),
     z.number(),
   ]),
-  designation: z.string().min(1, "Designation is required"),
-  status: z.union([z.string().min(1, "Status is required"), z.string()]),
+  status: z.enum([
+    "APPLICATION_RECEIVED",
+    "INTERVIEW_SCHEDULED",
+    "HIRED",
+    "NOT_ACCEPTED",
+  ]),
+  hired_on: z.string().optional().or(z.literal('')), // Handled as optional string
 });
 
 export default {

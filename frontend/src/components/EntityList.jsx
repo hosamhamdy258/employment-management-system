@@ -11,12 +11,7 @@ export default function EntityList({
   addLabel = "Add",
   onAdd,
   totalCount = 0,
-  userRole,
 }) {
-
-  const filteredActions = actions.filter(
-    (action) => !action.roles || (userRole && action.roles.includes(userRole))
-  );
 
   return (
     <>
@@ -27,7 +22,7 @@ export default function EntityList({
           <p className="text-muted mb-0">Manage your {title.toLowerCase()} efficiently</p>
         </div>
         {onAdd && (
-          <button className="btn btn-outline-success" onClick={onAdd}>
+          <button className="btn btn-outline-secondary" onClick={onAdd}>
             <PlusCircle className="me-2" />
             {addLabel}
           </button>
@@ -50,12 +45,12 @@ export default function EntityList({
               <thead>
                 <tr>
                   {columns.map((col) => (
-                    <th key={col.field} className="fw-semibold py-3 px-4 border-secondary">
+                    <th key={col.field} className="fw-semibold py-3 px-4">
                       {col.label}
                     </th>
                   ))}
                   {actions.length > 0 && (
-                    <th className="fw-semibold py-3 px-4 border-secondary text-center">
+                    <th className="fw-semibold py-3 px-4 text-center">
                       Actions
                     </th>
                   )}
@@ -85,7 +80,7 @@ export default function EntityList({
                   data.map((row) => (
                     <tr key={row.id}>
                       {columns.map((col) => (
-                        <td key={col.field} className="py-3 px-4 border-secondary">
+                        <td key={col.field} className="py-3 px-4">
                           <div className="fw-medium">
                             {col.render
                               ? col.render(row[col.field], row)
@@ -93,10 +88,10 @@ export default function EntityList({
                           </div>
                         </td>
                       ))}
-                      {filteredActions.length > 0 && (
-                        <td className="py-3 px-4 border-secondary">
+                      {actions.length > 0 && (
+                        <td className="py-3 px-4">
                           <div className="d-flex justify-content-center gap-2 flex-wrap">
-                            {filteredActions.map((action, i) => (
+                            {actions.map((action, i) => (
                               <button
                                 key={i}
                                 className="btn btn-sm btn-outline-secondary"

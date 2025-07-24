@@ -160,6 +160,9 @@ export default function EmployeeList() {
       onDataTransformForDisplay={transformEmployeeDataForDisplay}
       validationSchema={employeeSchema}
       renderViewDetails={(data) => <EmployeeDetails data={data} />}
+      addRoles={['ADMIN', 'MANAGER']}
+      editRoles={['ADMIN', 'MANAGER']}
+      deleteRoles={['ADMIN', 'MANAGER']}
     />
   );
 }

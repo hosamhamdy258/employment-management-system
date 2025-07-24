@@ -43,7 +43,16 @@ class CompanyViewSet(viewsets.ModelViewSet):
         _num_employees=Count("employee", distinct=True)
     ).order_by("-id")
     serializer_class = CompanySerializer
-    permission_classes = [IsAdmin]
+
+    def get_permissions(self):
+        """
+        Instantiates and returns the list of permissions that this view requires.
+        """
+        if self.action in ['list', 'retrieve', 'all']:
+            permission_classes = [IsAuthenticated]
+        else:
+            permission_classes = [IsAdmin]
+        return [permission() for permission in permission_classes]
 
     @action(detail=False, methods=["get"])
     def all(self, request):
@@ -75,8 +84,17 @@ class DepartmentViewSet(viewsets.ModelViewSet):
 
     queryset = Department.objects.select_related("company").all()
     serializer_class = DepartmentSerializer
-    permission_classes = [IsManager | IsAdmin]
     filterset_fields = ["company"]
+
+    def get_permissions(self):
+        """
+        Instantiates and returns the list of permissions that this view requires.
+        """
+        if self.action in ['list', 'retrieve', 'all']:
+            permission_classes = [IsAuthenticated]
+        else:
+            permission_classes = [IsManager | IsAdmin]
+        return [permission() for permission in permission_classes]
 
     @action(detail=False, methods=["get"])
     def all(self, request):

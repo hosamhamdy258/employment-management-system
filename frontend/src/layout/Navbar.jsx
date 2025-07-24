@@ -3,11 +3,11 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { Navbar as BSNavbar, Nav, Container, Button } from 'react-bootstrap';
 import useAuthStore from "../store/auth";
 import useThemeStore from "../store/theme";
-import { Building, Diagram3, People, BoxArrowRight, Sun, Moon } from 'react-bootstrap-icons';
+import { Building, Diagram3, People, BoxArrowRight, Sun, Moon, Speedometer2 } from 'react-bootstrap-icons';
 
 export default function Navbar() {
-  const logout = useAuthStore((s) => s.logout);
-  const token = useAuthStore((s) => s.token);
+  const user = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
   const { theme, toggleTheme } = useThemeStore();
   const navigate = useNavigate();
 
@@ -15,6 +15,13 @@ export default function Navbar() {
     logout();
     navigate("/login");
   };
+
+  const navLinks = [
+    { path: "/dashboard", label: "Dashboard", icon: <Speedometer2 className="me-2" />, roles: ['ADMIN', 'MANAGER', 'EMPLOYEE'] },
+    { path: "/companies", label: "Companies", icon: <Building className="me-2" />, roles: ['ADMIN', 'MANAGER', 'EMPLOYEE'] },
+    { path: "/departments", label: "Departments", icon: <Diagram3 className="me-2" />, roles: ['ADMIN', 'MANAGER', 'EMPLOYEE'] },
+    { path: "/employees", label: "Employees", icon: <People className="me-2" />, roles: ['ADMIN', 'MANAGER'] },
+  ];
 
   return (
     <BSNavbar expand="lg" bg="body-tertiary" className="shadow-sm">
@@ -27,41 +34,19 @@ export default function Navbar() {
         <BSNavbar.Toggle aria-controls="basic-navbar-nav" className="border-0" />
         
         <BSNavbar.Collapse id="basic-navbar-nav">
-          {token && (
+          {user && (
             <Nav className="ms-auto align-items-lg-center">
-              <Nav.Item className="mx-1">
-                <Nav.Link as={NavLink} to="/dashboard" className={({ isActive }) => 
-                  `px-3 py-2 rounded ${isActive ? "active fw-semibold" : ""}`
-                }>
-                  <i className="bi bi-grid-1x2-fill me-2"></i>Dashboard
-                </Nav.Link>
-              </Nav.Item>
-              <Nav.Item className="mx-1">
-                <Nav.Link as={NavLink} to="/companies" className={({ isActive }) => 
-                  `px-3 py-2 rounded ${isActive ? "active fw-semibold" : ""}`
-                }>
-                  <Building className="me-2" />
-                  Companies
-                </Nav.Link>
-              </Nav.Item>
-              
-              <Nav.Item className="mx-1">
-                <Nav.Link as={NavLink} to="/departments" className={({ isActive }) => 
-                  `px-3 py-2 rounded ${isActive ? "active fw-semibold" : ""}`
-                }>
-                  <Diagram3 className="me-2" />
-                  Departments
-                </Nav.Link>
-              </Nav.Item>
-              
-              <Nav.Item className="mx-1">
-                <Nav.Link as={NavLink} to="/employees" className={({ isActive }) => 
-                  `px-3 py-2 rounded ${isActive ? "active fw-semibold" : ""}`
-                }>
-                  <People className="me-2" />
-                  Employees
-                </Nav.Link>
-              </Nav.Item>
+              {navLinks.map(link => (
+                link.roles.includes(user.role) && (
+                  <Nav.Item key={link.path} className="mx-1">
+                    <Nav.Link as={NavLink} to={link.path} className={({ isActive }) => 
+                      `px-3 py-2 rounded ${isActive ? "active fw-semibold" : ""}`
+                    }>
+                      {link.icon}{link.label}
+                    </Nav.Link>
+                  </Nav.Item>
+                )
+              ))}
               
               <Nav.Item className="ms-lg-3 mt-2 mt-lg-0">
                 <Button 

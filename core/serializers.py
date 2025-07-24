@@ -25,6 +25,20 @@ class DepartmentSerializer(serializers.ModelSerializer):
         model = Department
         fields = ["id", "company", "company_name", "name", "num_employees"]
 
+    def validate(self, data):
+        # Case-insensitive uniqueness validation for department name within a company.
+        name = data.get('name')
+        company = data.get('company')
+        if name and company:
+            queryset = Department.objects.filter(company=company, name__iexact=name)
+            if self.instance:
+                queryset = queryset.exclude(pk=self.instance.pk)
+            if queryset.exists():
+                raise serializers.ValidationError({
+                    'name': 'A department with this name already exists in this company.'
+                })
+        return data
+
 
 class EmployeeSerializer(serializers.ModelSerializer):
     company_name = serializers.CharField(source="company.name", read_only=True)
@@ -34,6 +48,20 @@ class EmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = '__all__'
+
+    def validate(self, data):
+        # Case-insensitive uniqueness validation for employee name within a department.
+        name = data.get('name')
+        department = data.get('department')
+        if name and department:
+            queryset = Employee.objects.filter(department=department, name__iexact=name)
+            if self.instance:
+                queryset = queryset.exclude(pk=self.instance.pk)
+            if queryset.exists():
+                raise serializers.ValidationError({
+                    'name': 'An employee with this name already exists in this department.'
+                })
+        return data
 
 
 class EmployeeNestedSerializer(serializers.ModelSerializer):
