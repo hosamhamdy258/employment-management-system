@@ -30,6 +30,13 @@ export default function Navbar() {
           {token && (
             <Nav className="ms-auto align-items-lg-center">
               <Nav.Item className="mx-1">
+                <Nav.Link as={NavLink} to="/dashboard" className={({ isActive }) => 
+                  `px-3 py-2 rounded ${isActive ? "active fw-semibold" : ""}`
+                }>
+                  <i className="bi bi-grid-1x2-fill me-2"></i>Dashboard
+                </Nav.Link>
+              </Nav.Item>
+              <Nav.Item className="mx-1">
                 <Nav.Link as={NavLink} to="/companies" className={({ isActive }) => 
                   `px-3 py-2 rounded ${isActive ? "active fw-semibold" : ""}`
                 }>

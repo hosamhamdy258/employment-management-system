@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import CompanyList from './pages/CompanyList';
 import DepartmentList from './pages/DepartmentList';
 import EmployeeList from './pages/EmployeeList';
+import Dashboard from './pages/Dashboard';
 import NotFound from './pages/NotFound';
 import Navbar from './layout/Navbar';
 import Layout from './layout/Layout';
@@ -44,11 +45,12 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route element={<PrivateRoute><Layout /></PrivateRoute>}>
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/companies" element={<CompanyList />} />
             <Route path="/departments" element={<DepartmentList />} />
             <Route path="/employees" element={<EmployeeList />} />
           </Route>
-          <Route path="/" element={<Navigate to={token ? "/companies" : "/login"} replace />} />
+          <Route path="/" element={<Navigate to={token ? "/dashboard" : "/login"} replace />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>

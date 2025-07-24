@@ -6,6 +6,10 @@ SETUP_MARKER=/.setup_done
 
 if [ ! -f "$SETUP_MARKER" ]; then
     echo "Running initial setup..."
+
+    # Create logs directory
+    echo "Creating logs directory..."
+    mkdir -p logs
     
     # Run migrations
     echo "Running migrations..."

@@ -1,4 +1,5 @@
-from rest_framework import viewsets, permissions, views, status
+from rest_framework import viewsets, permissions, views, status, generics
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.core.exceptions import ValidationError
@@ -123,3 +124,37 @@ class EmployeeStatusChoicesView(views.APIView):
         return Response([{"value": choice[0], "label": choice[1]} for choice in choices])
 
     permission_classes = [IsEmployee | IsManager | IsAdmin]
+
+
+
+
+
+class DashboardStatsView(views.APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        # Aggregate data for stats cards
+        company_count = Company.objects.count()
+        department_count = Department.objects.count()
+        employee_count = Employee.objects.count()
+
+        # Aggregate data for charts
+        employees_per_company = Company.objects.annotate(
+            employee_count=Count('employee')).filter(employee_count__gt=0).values('name', 'employee_count')
+
+        departments_per_company = Company.objects.annotate(
+            department_count=Count('department')).filter(department_count__gt=0).values('name', 'department_count')
+
+        # Combine all data into a single response
+        response_data = {
+            'stats': {
+                'companies': company_count,
+                'departments': department_count,
+                'employees': employee_count,
+            },
+            'chart_data': {
+                'employees_per_company': list(employees_per_company),
+                'departments_per_company': list(departments_per_company),
+            }
+        }
+        return Response(response_data)

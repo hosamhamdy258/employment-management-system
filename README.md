@@ -33,8 +33,8 @@ Follow these instructions to get the development environment up and running on y
 1.  **Clone the Repository**
 
     ```bash
-    git clone <your-repository-url>
-    cd <repository-folder>
+    git clone https://github.com/hosamhamdy258/employment-management-system
+    cd employment-management-system
     ```
 
 2.  **Start the Application**
@@ -88,7 +88,7 @@ These interfaces provide detailed information about each endpoint, including the
 - [x] **APIs**: Full RESTful API for all models.
 - [ ] **Workflow (Bonus)**: Onboarding process for new employees.
 - [ ] **Testing (Bonus)**: Unit and integration tests.
-- [ ] **Logging (Bonus)**: Application logging.
+- [x] **Logging (Bonus)**: Application logging.
 
 ### Frontend Requirements
 - [x] **UI**: Login, Company, Department, and Employee management pages.
@@ -96,5 +96,5 @@ These interfaces provide detailed information about each endpoint, including the
 - [x] **API Integration**: Frontend is fully integrated with the backend API.
 - [x] **Error Handling**: Server-side errors are handled and displayed to the user.
 - [ ] **User Account Management (Bonus)**: Edit/View user account pages.
-- [ ] **Summary Dashboard (Bonus)**: Dashboard with analytics.
+- [x] **Summary Dashboard (Bonus)**: Dashboard with analytics.
 - [ ] **Employee Report (Bonus)**: Detailed report of hired employees.

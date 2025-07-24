@@ -4,6 +4,7 @@ from .views import (
     DepartmentViewSet,
     EmployeeViewSet,
     EmployeeStatusChoicesView,
+    DashboardStatsView,
 )
 from django.urls import path, include
 from rest_framework_simplejwt.views import (
@@ -25,5 +26,10 @@ urlpatterns = router.urls + [
         "employee-status-choices/",
         EmployeeStatusChoicesView.as_view(),
         name="employee-status-choices",
+    ),
+    path(
+        "dashboard-stats/",
+        DashboardStatsView.as_view(),
+        name="dashboard-stats",
     ),
 ]
