@@ -9,7 +9,7 @@ if [ ! -f "$SETUP_MARKER" ]; then
     
     # Run migrations
     echo "Running migrations..."
-    python manage.py makemigrations
+    python manage.py makemigrations accounts core
     python manage.py migrate
     
     # Load demo data

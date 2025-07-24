@@ -42,10 +42,12 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
-    "accounts",
-    "core",
     "drf_yasg",
     "corsheaders",
+    "django_filters",
+    "rest_framework_simplejwt",
+    "accounts",
+    "core",
 ]
 
 MIDDLEWARE = [
@@ -81,6 +83,7 @@ WSGI_APPLICATION = "employee_mgmt.wsgi.application"
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "http://0.0.0.0:5173",
 ]
 
 
